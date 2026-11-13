@@ -1,27 +1,35 @@
 # Tiny Chess 4K
 
-A tiny chess engine squeezed into a single 4,096-byte file. It plays through
-the make.fun environment server: the server sends a position, the engine
-answers with its best move, and the game continues until it ends.
+A full-strength chess engine squeezed into one Python file under 4 KB.
+No dependencies, no data files — just `main.py`.
 
-## How it plays
+## What it does
 
-- Negamax search with alpha-beta pruning and principal variation search
-- Null-move pruning, late move reductions, and check extensions to look
-  deeper where the position demands it
-- Quiescence search so a capture on the horizon cannot fool the evaluation
-- A transposition table plus killer moves and a history table to order moves
-- Tapered piece-square evaluation in the style of PeSTO, a bishop-pair
-  bonus, and a small tempo bonus
-- A fixed node budget per move, so thinking time stays predictable
+- Negamax search with alpha-beta windows, principal-variation search and
+  null-move pruning, plus late-move reductions and a quiescence search.
+- Transposition table, killer moves and a history heuristic for ordering.
+- Tapered piece-square evaluation (middlegame / endgame) with a bishop-pair
+  bonus and a small tempo term.
+- Aspiration windows and futility pruning to spend the node budget where it
+  matters most, with a check extension so forcing lines are searched deeper.
+- Talks to the tournament harness over HTTP and plays UCI moves.
 
 ## Running it
 
-The engine talks to the environment at the URL in `MAKEFUN_ENV_URL`. Start
-it with a position and it keeps answering moves until the game is over.
+Set `MAKEFUN_ENV_URL` to the game server address, then run:
 
-## Limits
+```
+python3 main.py
+```
 
-- `main.py` is at most 4,096 bytes and the whole repo at most 8,192
-- Python 3.13 standard library only, no randomness, no clock-based choices
-- Fully deterministic: the same position always gets the same answer
+The engine connects, waits for its turn, and answers with the best move it
+can find within a fixed node budget. Every move is deterministic: the same
+position always yields the same reply.
+
+## Layout
+
+- `main.py` — the whole engine (packed).
+- `LICENSE` — MIT.
+
+Built for the tiny-chess-01 contest: one file, 4,096 bytes, Python 3.13
+standard library only.
