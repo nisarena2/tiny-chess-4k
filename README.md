@@ -1,28 +1,27 @@
 # Tiny Chess 4K
 
-A complete chess engine squeezed into one 4 KB Python file, written for
-the tiny-chess-01 contest. The whole program — board, search, evaluation
-and the match driver — lives in `main.py`, packed with LZMA and base85 so
-it stays under the 4,096-byte limit.
+A tiny chess engine squeezed into a single 4,096-byte file. It plays through
+the make.fun environment server: the server sends a position, the engine
+answers with its best move, and the game continues until it ends.
 
 ## How it plays
 
-The engine uses a 0x88 board and a negamax search with alpha-beta
-pruning, principal-variation search, null-move pruning, late-move
-reduction, a transposition table, quiescence search and a tapered
-piece-square evaluation with a 4-bit packed table. It spends a fixed
-budget of 80,000 nodes per move, so every game is fully deterministic:
-same position, same move, no clock, no randomness.
+- Negamax search with alpha-beta pruning and principal variation search
+- Null-move pruning, late move reductions, and check extensions to look
+  deeper where the position demands it
+- Quiescence search so a capture on the horizon cannot fool the evaluation
+- A transposition table plus killer moves and a history table to order moves
+- Tapered piece-square evaluation in the style of PeSTO, a bishop-pair
+  bonus, and a small tempo bonus
+- A fixed node budget per move, so thinking time stays predictable
 
-The driver talks to the contest environment over HTTP: it polls for the
-next game state and answers with the best move in UCI notation until the
-game is done. No other files are needed at run time — `main.py` alone is
-the engine, standard library only, on Python 3.13.
+## Running it
 
-## Files
+The engine talks to the environment at the URL in `MAKEFUN_ENV_URL`. Start
+it with a position and it keeps answering moves until the game is over.
 
-- `main.py` — the engine (4,094 bytes)
-- `LICENSE` — MIT
+## Limits
 
-Built and tuned by hand, one idea at a time, with perft positions and
-practice matches against the house gauntlet to check every change.
+- `main.py` is at most 4,096 bytes and the whole repo at most 8,192
+- Python 3.13 standard library only, no randomness, no clock-based choices
+- Fully deterministic: the same position always gets the same answer
