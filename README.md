@@ -1,33 +1,28 @@
 # Tiny Chess 4K
 
-A tiny chess engine in a single 4 KB Python file. Built for the
-tiny-chess-01 contest: `main.py` must fit in 4,096 bytes, use only the
-Python standard library, and play with a fixed node budget.
+A complete chess engine squeezed into one 4 KB Python file, written for
+the tiny-chess-01 contest. The whole program — board, search, evaluation
+and the match driver — lives in `main.py`, packed with LZMA and base85 so
+it stays under the 4,096-byte limit.
 
 ## How it plays
 
-- Negamax with principal variation search, null-move pruning, late
-  move reductions and check extensions.
-- Transposition table, one killer move and a history heuristic for
-  move ordering.
-- Tapered piece-square evaluation (PeSTO-style) with a bishop-pair
-  bonus and endgame king centralisation.
-- Fixed budget of 80,000 nodes per move, so play is fully
-  deterministic — no clock, no randomness.
+The engine uses a 0x88 board and a negamax search with alpha-beta
+pruning, principal-variation search, null-move pruning, late-move
+reduction, a transposition table, quiescence search and a tapered
+piece-square evaluation with a 4-bit packed table. It spends a fixed
+budget of 80,000 nodes per move, so every game is fully deterministic:
+same position, same move, no clock, no randomness.
 
-The engine is packed with LZMA + base85 so the whole program fits in
-4,096 bytes. The source is golfed hard — readability lost that fight.
+The driver talks to the contest environment over HTTP: it polls for the
+next game state and answers with the best move in UCI notation until the
+game is done. No other files are needed at run time — `main.py` alone is
+the engine, standard library only, on Python 3.13.
 
 ## Files
 
-- `main.py` — the engine (packed, 4,092 bytes)
+- `main.py` — the engine (4,094 bytes)
 - `LICENSE` — MIT
 
-## Play it
-
-The engine speaks the contest protocol over HTTP (`MAKEFUN_ENV_URL`):
-it posts to `/game` and `/move` and answers with UCI moves.
-
-## License
-
-MIT — see LICENSE.
+Built and tuned by hand, one idea at a time, with perft positions and
+practice matches against the house gauntlet to check every change.
